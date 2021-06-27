@@ -14,7 +14,7 @@ load_dotenv(dotenv_path)
 app = Flask(__name__)
 
 DB_URI = os.environ.get("DB_URI")
-print(DB_URI)
+#print(DB_URI)
 app.config["MONGODB_HOST"] = DB_URI
 
 db = MongoEngine()
@@ -31,7 +31,7 @@ class Players(db.Document):
 @app.route('/', methods=['GET'])
 def query_records():
     endpoint = request.args.get('endpoint')
-    records = Players.objects(endpoint=endpoint)
+    records = Players.objects(endpoint=endpoint).limit(10)
     if not endpoint:
         return jsonify({'error': 'invalid endpoint'})
     else:
@@ -41,11 +41,13 @@ def query_records():
 @app.route('/', methods=['POST'])
 def update_record():
     record = request.get_json()
+    print(record)
     user = Players.objects(name=record['name'],endpoint=record['endpoint']).first()
     if not user:
         user = Players(**record).save()
         return jsonify(user.to_json()),201
-    else:
+    elif record['score'] > user['score']:
+        print("updated!")
         user.update(score=record['score'])
     return jsonify(user.to_json()),200
 
