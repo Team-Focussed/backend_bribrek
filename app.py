@@ -2,6 +2,7 @@
 # encoding: utf-8
 import json
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 from flask_mongoengine import MongoEngine
 import os
 from os.path import join, dirname
@@ -12,6 +13,9 @@ load_dotenv(dotenv_path)
 
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 DB_URI = os.environ.get("DB_URI")
 #print(DB_URI)
@@ -29,6 +33,7 @@ class Players(db.Document):
                 "score": self.score}
 
 @app.route('/', methods=['GET'])
+@cross_origin()
 def query_records():
     endpoint = request.args.get('endpoint')
     records = Players.objects(endpoint=endpoint).limit(10)
@@ -39,6 +44,7 @@ def query_records():
 
 
 @app.route('/', methods=['POST'])
+@cross_origin()
 def update_record():
     record = request.get_json()
     print(record)
