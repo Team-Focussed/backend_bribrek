@@ -52,12 +52,13 @@ def query_records():
 @cross_origin()
 def query_records_me():
     name = request.args.get('name')
-    records = Players.objects.order_by("-score").as_pymongo()
+    endpoint = request.args.get('endpoint')
+    records = Players.objects(endpoint=endpoint).order_by("-score").as_pymongo()
     position = 1
     for i in records:
         i["position"] = position
         position += 1
-        if i["name"] == name:
+        if i["name"] == name and i["endpoint"] == endpoint:
             del i["_id"]
             return jsonify(i)
         
