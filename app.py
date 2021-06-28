@@ -47,6 +47,25 @@ def query_records():
         return jsonify({'error': 'invalid endpoint'})
     else:
         return jsonify(records.order_by("-score"))
+    
+@app.route('/me', methods=['GET'])
+@cross_origin()
+def query_records_me():
+    name = request.args.get('name')
+    records = Players.objects.order_by("-score").as_pymongo()
+    position = 1
+    for i in records:
+        i["position"] = position
+        position += 1
+        if i["name"] == name:
+            del i["_id"]
+            return jsonify(i)
+        
+    return jsonify({'error': 'no such record or no name provided'})
+        
+  
+    
+
 
 
 @app.route('/', methods=['POST'])
