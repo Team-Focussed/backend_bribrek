@@ -36,7 +36,13 @@ class Players(db.Document):
 @cross_origin()
 def query_records():
     endpoint = request.args.get('endpoint')
-    records = Players.objects(endpoint=endpoint).limit(10)
+    top = request.args.get('top')
+    if not top:
+        top = 10
+    else:
+        top = int(top)
+    print(top)
+    records = Players.objects(endpoint=endpoint).limit(top)
     if not endpoint:
         return jsonify({'error': 'invalid endpoint'})
     else:
